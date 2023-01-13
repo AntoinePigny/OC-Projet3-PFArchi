@@ -1,40 +1,43 @@
+import { createElement, qs, qsa } from './utilities.js'
+
 const appendNewFigure = (nodeElement, work) => {
-   const newFigure = document.createElement('figure')
-   const newImage = document.createElement('img')
-   newImage.setAttribute('src', work.imageUrl)
-   newImage.setAttribute('alt', work.title)
-   newImage.setAttribute('crossorigin', 'anonymous')
-   const newFigcaption = document.createElement('figcaption')
-   const newCaption = document.createTextNode(work.title)
-   newFigcaption.appendChild(newCaption)
+   const newFigure = createElement('figure')
+   const newImage = createElement('img', {
+      src: work.imageUrl,
+      alt: work.title,
+      crossorigin: 'anonymous',
+   })
+   const newFigcaption = createElement('figcaption', {
+      text: work.title,
+   })
    newFigure.append(newImage, newFigcaption)
    nodeElement.appendChild(newFigure)
 }
 
+const appendNewFilter = (nodeElement, filter) => {
+   const newFilter = createElement()
+}
+
 fetch('http://localhost:5678/api/works')
-.then((res) => {
-    if (res.ok) {
+   .then((res) => {
+      if (res.ok) {
          return res.json()
       }
    })
    .then((data) => {
-       const galleryNode = document.querySelector('.gallery')
-       data.forEach((work) => {
-           appendNewFigure(galleryNode, work)
-        })
-    })
-    
-    
-    // const appendNewFigcaption = (caption, nodeElement) => {
-    //    const newFigcaption = document.createElement('figcaption')
-    //    const newCaption = document.createTextNode(caption)
-    //    newFigcaption.appendChild(newCaption)
-    //    nodeElement.appendChild(newFigcaption)
-    // }
-    
-    // const appendWorksCaptionsToGallery = (works) => {
-    //    const galleryNode = document.querySelector('.gallery')
-    //    works.forEach((work) => {
-    //       appendNewFigCaption(work.title, galleryNode)
-    //    })
-    // }
+      console.log(data)
+      const galleryNode = qs('.gallery')
+      data.forEach((work) => {
+         appendNewFigure(galleryNode, work)
+      })
+   })
+
+fetch('http://localhost:5678/api/categories')
+   .then((res) => {
+      if (res.ok) {
+         return res.json()
+      }
+   })
+   .then((data) => {
+      console.log(data)
+   })
