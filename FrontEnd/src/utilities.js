@@ -3,7 +3,6 @@
  * @param {string}type
  * @param {obj}options
  */
-
 export function createElement(type, options = {}) {
    const element = document.createElement(type)
 
@@ -35,7 +34,6 @@ export function createElement(type, options = {}) {
  * @param {string} selector
  * @param {interface} parent
  */
-
 export function qs(selector, parent = document) {
    return parent.querySelector(selector)
 }
@@ -46,7 +44,6 @@ export function qs(selector, parent = document) {
  * @param {interface} parent
  * @returns {array}
  */
-
 export function qsa(selector, parent = document) {
    return [...parent.querySelectorAll(selector)]
 }

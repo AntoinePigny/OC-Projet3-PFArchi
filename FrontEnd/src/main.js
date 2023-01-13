@@ -18,6 +18,8 @@ const appendNewFilter = (nodeElement, filter) => {
    const newFilter = createElement()
 }
 
+//REFACTO en utilisant try & catch
+
 fetch('http://localhost:5678/api/works')
    .then((res) => {
       if (res.ok) {
