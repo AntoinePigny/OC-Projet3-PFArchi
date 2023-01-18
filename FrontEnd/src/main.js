@@ -1,5 +1,11 @@
 import { createElement, qs, qsa } from './utilities.js'
 
+/**
+ * Creates a figure element with img and caption and appends as child to given element
+ * Using const syntax for practice => refacto to function
+ * @param {any} nodeElement
+ * @param {any} work
+ */
 const appendNewFigure = (nodeElement, work) => {
    const newFigure = createElement('figure')
    const newImage = createElement('img', {
@@ -14,8 +20,29 @@ const appendNewFigure = (nodeElement, work) => {
    nodeElement.appendChild(newFigure)
 }
 
-const appendNewFilter = (nodeElement, filter) => {
-   const newFilter = createElement()
+/**
+ *
+ * @param {*} works => fetch result
+ * @param {string} elementId
+ * @param {*} categoryName
+ * @param {*} elementNode
+ */
+function appendNewFilter(works, elementId, categoryName, elementNode) {
+   const selectedElement = qs(elementId)
+   const newFilter = createElement('button', {
+      text: categoryName,
+      class: 'filter',
+   })
+   newFilter.addEventListener('click', () => {
+      const filteredWorks = works.filter((work) => {
+         return work.category.name === categoryName
+      })
+      elementNode.innerHTML = ''
+      filteredWorks.forEach((work) => {
+         appendNewFigure(elementNode, work)
+      })
+   })
+   selectedElement.appendChild(newFilter)
 }
 
 //REFACTO en utilisant try & catch
@@ -27,19 +54,22 @@ fetch('http://localhost:5678/api/works')
       }
    })
    .then((data) => {
-      console.log(data)
+      const categoriesList = new Set(data.map((data) => data.category.name))
       const galleryNode = qs('.gallery')
-      data.forEach((work) => {
-         appendNewFigure(galleryNode, work)
+      categoriesList.forEach((category) => {
+         appendNewFilter(data, '#projectsFilters', category, galleryNode)
       })
    })
 
-fetch('http://localhost:5678/api/categories')
-   .then((res) => {
-      if (res.ok) {
-         return res.json()
-      }
-   })
-   .then((data) => {
-      console.log(data)
-   })
+/*       data.forEach((work) => {
+      appendNewFigure(galleryNode, work)
+   }) */
+// fetch('http://localhost:5678/api/categories')
+//    .then((res) => {
+//       if (res.ok) {
+//          return res.json()
+//       }
+//    })
+//    .then((data) => {
+//       console.log(data)
+//    })
