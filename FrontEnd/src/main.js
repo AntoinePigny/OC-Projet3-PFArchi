@@ -101,6 +101,37 @@ function addFilter(categories, data) {
 
 /** POST request Login */
 
+function addListenerSendLoginForm() {
+   const loginForm = qs('.login-form')
+   loginForm.addEventListener('submit', () => {
+      event.preventDefault()
+      sendLoginFormPOST()
+   })
+}
+
+async function sendLoginFormPOST() {
+   const user = {
+      email: qs('#login-mail', event.target).value,
+      password: qs('#password', event.target).value,
+   }
+   const response = await fetch(`${BASE_URL}users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user),
+   })
+   const result = response.json()
+}
+
+try {
+   addListenerSendLoginForm()
+} catch (error) {
+   console.log(error)
+}
+
+/* 
+async function userLogin() {
+} */
+
 //REFACTO en utilisant try & catch
 
 /* old_function main() {
