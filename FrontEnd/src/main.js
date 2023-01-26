@@ -2,6 +2,9 @@ import { createElement, qs, qsa } from './utilities.js'
 
 export const BASE_URL = 'http://localhost:5678/api/'
 
+/**
+ * GET request and display of works
+ */
 async function showWorks() {
    const response = await fetch(`${BASE_URL}works`)
    const works = await response.json()
@@ -38,23 +41,39 @@ const appendNewFigure = (nodeElement, work) => {
    nodeElement.appendChild(newFigure)
 }
 
+/**
+ * Creates Set with the categories' names
+ * @param {array} data
+ * @returns Set
+ */
 function deleteDuplicates(data) {
    return new Set(data.map((data) => data.category.name))
 }
 
-function addListOnFilterToggle(categorie, nom, data) {
-   categorie.addEventListener('click', () => {
-      if (nom !== 'Tous') return showData(data, nom)
+/**
+ * Adds event to button executing showData based on button's name
+ * @param {element} category
+ * @param {string} name
+ * @param {array} data
+ */
+function addListOnFilterToggle(category, name, data) {
+   category.addEventListener('click', () => {
+      if (name !== 'Tous') return showData(data, name)
       return showData(data)
    })
 }
 
-function showData(datas, filtre = null) {
+/**
+ * Filters data with matching filter (default = null) and creates new figure for each one
+ * @param {array} datas
+ * @param {string} filter
+ */
+function showData(datas, filter = null) {
    const galleryNode = qs('.gallery')
    galleryNode.innerHTML = ''
-   if (filtre) {
+   if (filter) {
       datas = datas.filter((work) => {
-         return work.category.name === filtre
+         return work.category.name === filter
       })
    }
    datas.forEach((data) => {
@@ -62,6 +81,11 @@ function showData(datas, filtre = null) {
    })
 }
 
+/**
+ * Creates filter button for each item in categories
+ * @param {array} categories
+ * @param {array} data
+ */
 function addFilter(categories, data) {
    const filterBar = qs('#projectsFilters')
    const categoryAll = ['Tous', ...categories]
@@ -74,6 +98,8 @@ function addFilter(categories, data) {
       addListOnFilterToggle(newFilter, element, data)
    })
 }
+
+/** POST request Login */
 
 //REFACTO en utilisant try & catch
 
