@@ -1,12 +1,12 @@
 import { createElement, qs, qsa } from './utilities.js'
 
-export const BASE_URL = 'http://localhost:5678/api/'
+export const BASE_URL = 'http://localhost:5678/api'
 
 /**
  * GET request and display of works
  */
 async function showWorks() {
-   const response = await fetch(`${BASE_URL}works`)
+   const response = await fetch(`${BASE_URL}/works`)
    const works = await response.json()
    const categories = deleteDuplicates(works)
    addFilter(categories, works)
@@ -70,7 +70,11 @@ function addListOnFilterToggle(category, name, data) {
  */
 function showData(datas, filter = null) {
    const galleryNode = qs('.gallery')
-   galleryNode.innerHTML = ''
+
+   while (galleryNode.firstChild) {
+      galleryNode.firstChild.remove()
+   }
+
    if (filter) {
       datas = datas.filter((work) => {
          return work.category.name === filter
@@ -105,28 +109,33 @@ function addListenerSendLoginForm() {
    const loginForm = qs('.login-form')
    loginForm.addEventListener('submit', () => {
       event.preventDefault()
-      sendLoginFormPOST()
+      handleLoginSubmission()
    })
 }
 
-async function sendLoginFormPOST() {
-   const user = {
-      email: qs('#login-mail', event.target).value,
-      password: qs('#password', event.target).value,
+async function handleLoginSubmission() {
+   try {
+      const user = {
+         email: qs('#login-mail', event.target).value,
+         password: qs('#password', event.target).value,
+      }
+      const response = await fetch(`${BASE_URL}/users/login`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(user),
+      })
+
+      if (response.status === 200) {
+         window.open('index.html', '_self')
+      } else {
+         throw 'E-mail/Mot de passe incorrect'
+      }
+   } catch (e) {
+      //Création d'un élément du dom à append au form avec le message d'erreur
    }
-   const response = await fetch(`${BASE_URL}users/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user),
-   })
-   const result = response.json()
 }
 
-try {
-   addListenerSendLoginForm()
-} catch (error) {
-   console.log(error)
-}
+addListenerSendLoginForm()
 
 /* 
 async function userLogin() {
