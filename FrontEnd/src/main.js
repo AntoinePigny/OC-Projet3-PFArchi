@@ -103,39 +103,20 @@ function addFilter(categories, data) {
    })
 }
 
-/** POST request Login */
+/* LOCAL STORAGE SESSION */
 
-function addListenerSendLoginForm() {
-   const loginForm = qs('.login-form')
-   loginForm.addEventListener('submit', () => {
-      event.preventDefault()
-      handleLoginSubmission()
+if (localStorage.getItem('userToken')) {
+   addModifyBanner('header', 'h1')
+}
+
+function addModifyBanner(parent, referent) {
+   const modifyBanner = createElement('div', {
+      class: 'modify-banner',
    })
+   const referenceElement = qs(referent)
+   const parentElement = qs(parent)
+   parentElement.insertBefore(modifyBanner, referenceElement)
 }
-
-async function handleLoginSubmission() {
-   try {
-      const user = {
-         email: qs('#login-mail', event.target).value,
-         password: qs('#password', event.target).value,
-      }
-      const response = await fetch(`${BASE_URL}/users/login`, {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(user),
-      })
-
-      if (response.status === 200) {
-         window.open('index.html', '_self')
-      } else {
-         throw 'E-mail/Mot de passe incorrect'
-      }
-   } catch (e) {
-      //Création d'un élément du dom à append au form avec le message d'erreur
-   }
-}
-
-addListenerSendLoginForm()
 
 /* 
 async function userLogin() {

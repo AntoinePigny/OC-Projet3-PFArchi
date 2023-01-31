@@ -174,6 +174,11 @@ h2 {
    font-size: 30px;
    color: #1d6154;
 }
+
+.modify-banner {
+   background-color: #000;
+   min-height: 4rem;
+}
 nav ul {
    display: flex;
    align-items: center;
@@ -276,6 +281,19 @@ input[type='submit'] {
    width: 180px;
    text-align: center;
    border-radius: 60px;
+}
+
+@keyframes orange-ease {
+   0% {
+      color: black;
+   }
+   100% {
+      color: #b1663c;
+   }
+}
+
+.login-error {
+   animation: orange-ease 1s ease-in alternate;
 }
 
 footer nav ul {
