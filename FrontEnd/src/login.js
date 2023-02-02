@@ -1,38 +1,40 @@
-import { createElement, qs, qsa } from './utilities.js'
-import { BASE_URL } from './main.js'
-
+import { createElement, qs, BASE_URL } from './utilities.js'
 /**
  *Adds event handling login on submit
+
+ Ajouter directement les données du form
  */
 function addListenerSendLoginForm() {
    const loginForm = qs('.login-form')
-   loginForm.addEventListener('submit', () => {
+   loginForm.addEventListener('submit', (event) => {
       event.preventDefault()
-      handleLoginSubmission()
+      const user = {
+         email: qs('#login-mail', event.target).value,
+         password: qs('#password', event.target).value,
+      }
+      handleLoginSubmission(user)
    })
 }
 
 /**
  *Handles login using post request to API
  */
-async function handleLoginSubmission() {
+async function handleLoginSubmission(formData) {
    try {
-      const user = {
-         email: qs('#login-mail', event.target).value,
-         password: qs('#password', event.target).value,
-      }
       const response = await fetch(`${BASE_URL}/users/login`, {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(user),
+         body: JSON.stringify(formData),
       })
 
       if (response.status === 200) {
          const result = await response.json()
-         localStorage.setItem('userToken', result.token)
+         sessionStorage.setItem('userToken', result.token)
          window.open('index.html', '_self')
-      } else {
-         throw 'E-mail/Mot de passe incorrect'
+      } else if (response.status === 401) {
+         throw 'Mot de passe incorrect'
+      } else if (response.status === 404) {
+         throw 'Adresse e-mail incorrecte'
       }
    } catch (e) {
       //Creates dom element to display error message
@@ -41,7 +43,7 @@ async function handleLoginSubmission() {
          text: e,
          class: 'login-error',
       })
-      if (loginSection.lastChild.previousSibling.className === 'login-form') {
+      if (qs('.login-error')) {
          loginSection.lastChild.remove()
          loginSection.appendChild(error)
       } else {

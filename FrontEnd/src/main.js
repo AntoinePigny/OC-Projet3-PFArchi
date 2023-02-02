@@ -1,6 +1,4 @@
-import { createElement, qs, qsa } from './utilities.js'
-
-export const BASE_URL = 'http://localhost:5678/api'
+import { createElement, qs, qsa, BASE_URL } from './utilities.js'
 
 /**
  * GET request and display of works
@@ -105,10 +103,19 @@ function addFilter(categories, data) {
 
 /* LOCAL STORAGE SESSION */
 
-if (localStorage.getItem('userToken')) {
-   addModifyBanner('header', 'h1')
+if (sessionStorage.getItem('userToken')) {
+   addModifyBanner('body', 'header')
+   addModifyLink('.modify-banner', 'Mode édition')
+   addModifyLink('#introduction-photo')
+   addModifyLink('#introduction-text')
+   addModifyLink('#portfolio-title')
 }
 
+/**
+ * Adds banner
+ * @param {*} parent
+ * @param {*} referent
+ */
 function addModifyBanner(parent, referent) {
    const modifyBanner = createElement('div', {
       class: 'modify-banner',
@@ -116,6 +123,31 @@ function addModifyBanner(parent, referent) {
    const referenceElement = qs(referent)
    const parentElement = qs(parent)
    parentElement.insertBefore(modifyBanner, referenceElement)
+}
+
+/**
+ * Adds a modify link and icon
+ * @param {string} parent
+ * @param {string} linkText
+ */
+function addModifyLink(parent, linkText = 'Modifier') {
+   const modifyDiv = createElement('span')
+   const modifyIcon = createElement('i', {
+      class: 'fa-thin fa-pen-to-square',
+   })
+   const modifyLink = createElement('a', {
+      text: linkText,
+   })
+   modifyDiv.append(modifyIcon, modifyLink)
+
+   const parentElement = qs(parent)
+   console.log(parentElement)
+   if (parent === '#introduction-text') {
+      const referenceElement = qs('h2')
+      parentElement.insertBefore(modifyDiv, referenceElement)
+   } else {
+      parentElement.appendChild(modifyDiv)
+   }
 }
 
 /* 

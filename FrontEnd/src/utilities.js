@@ -8,7 +8,7 @@ export function createElement(type, options = {}) {
 
    Object.entries(options).forEach(([key, value]) => {
       if (key === 'class') {
-         element.classList.add(value)
+         element.className = value
          return
       }
 
@@ -47,3 +47,5 @@ export function qs(selector, parent = document) {
 export function qsa(selector, parent = document) {
    return [...parent.querySelectorAll(selector)]
 }
+
+export const BASE_URL = 'http://localhost:5678/api'

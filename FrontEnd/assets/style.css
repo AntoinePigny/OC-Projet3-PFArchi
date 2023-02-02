@@ -176,8 +176,12 @@ h2 {
 }
 
 .modify-banner {
+   position: sticky;
    background-color: #000;
    min-height: 4rem;
+   width: 100vw;
+   top: 0;
+   margin-left: calc(-50vw + 50%);
 }
 nav ul {
    display: flex;
