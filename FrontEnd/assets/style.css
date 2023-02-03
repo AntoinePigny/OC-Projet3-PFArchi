@@ -153,6 +153,10 @@ a:visited {
    color: black;
 }
 
+i {
+   margin-right: 5px;
+}
+
 h1 {
    display: flex;
    flex-direction: column;
@@ -182,7 +186,34 @@ h2 {
    width: 100vw;
    top: 0;
    margin-left: calc(-50vw + 50%);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 20px;
 }
+
+.modify-banner div {
+   color: #fff;
+}
+
+.apply-changes {
+   font-family: 'Work Sans';
+   background-color: #fff;
+   text-align: center;
+   height: 38px;
+   border-radius: 60px;
+   padding-inline: 23px;
+   border-style: none;
+   border: 1px solid white;
+   cursor: pointer;
+   transition: background-color ease-in 1s;
+}
+
+.apply-changes:hover {
+   background-color: #000;
+   color: white;
+}
+
 nav ul {
    display: flex;
    align-items: center;
@@ -202,11 +233,18 @@ a:hover {
    align-items: center;
 }
 #introduction figure {
+   display: block;
    flex: 1;
 }
-#introduction img {
+
+#introduction div {
+   margin: 1rem auto;
+}
+
+#introduction img,
+#introduction-photo div {
    display: block;
-   margin: auto;
+   margin: 1rem auto;
    width: 80%;
 }
 
@@ -220,10 +258,24 @@ a:hover {
 #introduction p {
    margin-bottom: 0.5em;
 }
+
 #portfolio h2 {
    text-align: center;
+   display: flex;
+   align-items: center;
+   justify-content: center;
    margin-bottom: 1em;
 }
+
+#portfolio h2 > div {
+   display: inline;
+   font-size: 14px;
+   font-family: 'Work Sans';
+   color: #000;
+   font-weight: normal;
+   margin-left: 2rem;
+}
+
 .gallery {
    width: 100%;
    display: grid;

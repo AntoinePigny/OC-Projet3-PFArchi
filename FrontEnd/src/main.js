@@ -105,9 +105,9 @@ function addFilter(categories, data) {
 
 if (sessionStorage.getItem('userToken')) {
    addModifyBanner('body', 'header')
-   addModifyLink('.modify-banner', 'Mode édition')
+   addModifyLink('.modify-banner', 'Mode édition', 'button')
    addModifyLink('#introduction-photo')
-   addModifyLink('#introduction-text')
+   addModifyLink('#introduction-text', undefined, 'h2')
    addModifyLink('#portfolio-title')
 }
 
@@ -120,6 +120,11 @@ function addModifyBanner(parent, referent) {
    const modifyBanner = createElement('div', {
       class: 'modify-banner',
    })
+   const applyChangesButton = createElement('button', {
+      class: 'apply-changes',
+      text: 'publier les changements',
+   })
+   modifyBanner.appendChild(applyChangesButton)
    const referenceElement = qs(referent)
    const parentElement = qs(parent)
    parentElement.insertBefore(modifyBanner, referenceElement)
@@ -129,11 +134,12 @@ function addModifyBanner(parent, referent) {
  * Adds a modify link and icon
  * @param {string} parent
  * @param {string} linkText
+ * @param {string} referent
  */
-function addModifyLink(parent, linkText = 'Modifier') {
-   const modifyDiv = createElement('span')
+function addModifyLink(parent, linkText = 'Modifier', referent) {
+   const modifyDiv = createElement('div')
    const modifyIcon = createElement('i', {
-      class: 'fa-thin fa-pen-to-square',
+      class: 'fa-solid fa-pen-to-square',
    })
    const modifyLink = createElement('a', {
       text: linkText,
@@ -141,9 +147,9 @@ function addModifyLink(parent, linkText = 'Modifier') {
    modifyDiv.append(modifyIcon, modifyLink)
 
    const parentElement = qs(parent)
-   console.log(parentElement)
-   if (parent === '#introduction-text') {
-      const referenceElement = qs('h2')
+   const referenceElement = qs(referent)
+
+   if (parent === '#introduction-text' || '.modify-banner') {
       parentElement.insertBefore(modifyDiv, referenceElement)
    } else {
       parentElement.appendChild(modifyDiv)
