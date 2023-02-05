@@ -1,5 +1,11 @@
 import { createElement, qs, qsa, BASE_URL } from './utilities.js'
 
+try {
+   showWorks()
+} catch (error) {
+   console.log(error)
+}
+
 /**
  * GET request and display of works
  */
@@ -9,33 +15,40 @@ async function showWorks() {
    const categories = deleteDuplicates(works)
    addFilter(categories, works)
    showData(works)
-}
-
-try {
-   showWorks()
-} catch (error) {
-   console.log(error)
+   showGalleryModal(works)
 }
 
 // WORKS FILTER FUNCTIONS
 
 /**
- * Creates a figure element with img and caption and appends as child to given element
+ * Creates the basics of a figure element, with an image
+ * @param {} data
+ * @returns
+ */
+function createBasicFigure(data) {
+   const newFigure = createElement('figure')
+   const newImage = createElement('img', {
+      src: data.imageUrl,
+      alt: data.title,
+      crossorigin: 'anonymous',
+   })
+   newFigure.append(newImage)
+   return newFigure
+}
+
+/**
+ * Creates a full figure element with caption and appends as child to given element
  * Using const syntax for practice => refacto to function
  * @param {any} nodeElement
  * @param {any} work
  */
-const appendNewFigure = (nodeElement, work) => {
-   const newFigure = createElement('figure')
-   const newImage = createElement('img', {
-      src: work.imageUrl,
-      alt: work.title,
-      crossorigin: 'anonymous',
-   })
+const appendFullFigure = (nodeElement, work) => {
+   const newFigure = createBasicFigure(work)
    const newFigcaption = createElement('figcaption', {
       text: work.title,
    })
-   newFigure.append(newImage, newFigcaption)
+
+   newFigure.append(newFigcaption)
    nodeElement.appendChild(newFigure)
 }
 
@@ -79,7 +92,7 @@ function showData(datas, filter = null) {
       })
    }
    datas.forEach((data) => {
-      appendNewFigure(galleryNode, data)
+      appendFullFigure(galleryNode, data)
    })
 }
 
@@ -101,6 +114,35 @@ function addFilter(categories, data) {
    })
 }
 
+/* MODAL FUNCTIONS */
+
+function showGalleryModal(datas) {
+   const galleryNode = qs('.modal-gallery')
+   while (galleryNode.firstChild) {
+      galleryNode.firstChild.remove()
+   }
+   datas.forEach((data) => {
+      appendFullThumbnail(galleryNode, data)
+   })
+}
+
+function appendFullThumbnail(nodeElement, work) {
+   const newFigure = createBasicFigure(work)
+   const newEditLink = createElement('a', {
+      text: 'éditer',
+   })
+   const newDeleteButton = createElement('button', {
+      class: 'delete-work',
+   })
+   const newTrashIcon = createElement('i', {
+      class: 'fa-solid fa-trash-can',
+   })
+
+   newDeleteButton.appendChild(newTrashIcon)
+   newFigure.append(newDeleteButton, newEditLink)
+   nodeElement.appendChild(newFigure)
+}
+
 /* LOCAL STORAGE SESSION */
 
 if (sessionStorage.getItem('userToken')) {
@@ -109,6 +151,32 @@ if (sessionStorage.getItem('userToken')) {
    addModifyLink('#introduction-photo')
    addModifyLink('#introduction-text', undefined, 'h2')
    addModifyLink('#portfolio-title')
+
+   const modal = qs('.modal')
+   const overlay = qs('.overlay')
+   const openModalBtn = qs('.btn-open')
+   const closeModalBtn = qs('.btn-close')
+   const logoutBtn = qs('.apply-changes')
+
+   const openModal = function () {
+      modal.classList.remove('hidden')
+      overlay.classList.remove('hidden')
+   }
+
+   const closeModal = function () {
+      modal.classList.add('hidden')
+      overlay.classList.add('hidden')
+   }
+
+   const logout = function () {
+      sessionStorage.clear()
+      location.reload()
+   }
+
+   openModalBtn.addEventListener('click', openModal)
+   closeModalBtn.addEventListener('click', closeModal)
+   overlay.addEventListener('click', closeModal)
+   logoutBtn.addEventListener('click', logout)
 }
 
 /**
@@ -149,83 +217,34 @@ function addModifyLink(parent, linkText = 'Modifier', referent) {
    const parentElement = qs(parent)
    const referenceElement = qs(referent)
 
-   if (parent === '#introduction-text' || '.modify-banner') {
-      parentElement.insertBefore(modifyDiv, referenceElement)
-   } else {
-      parentElement.appendChild(modifyDiv)
+   switch (parent) {
+      case '#introduction-text' || '.modify-banner':
+         parentElement.insertBefore(modifyDiv, referenceElement)
+         break
+
+      case '#portfolio-title':
+         modifyLink.classList = 'btn btn-open'
+         parentElement.appendChild(modifyDiv)
+         break
+
+      default:
+         parentElement.appendChild(modifyDiv)
+         break
    }
 }
 
+//A débriefer
+
+//Pourquoi le if ne fonctionne pas ?
+/*    if (parent === '#introduction-text' || '.modify-banner') {
+         console.log(modifyLink)
+         parentElement.insertBefore(modifyDiv, referenceElement)
+      } else if (parent === '#portfolio-title') {
+         console.log(4)
+      } else {
+         parentElement.appendChild(modifyDiv)
+      } */
+
 /* 
-async function userLogin() {
-} */
-
-//REFACTO en utilisant try & catch
-
-/* old_function main() {
-   fetch(`${BASE_URL}works`).then((res) => {
-      if (res.ok)
-         return res.json().then((data) => {
-            const categories = deleteDuplicates(data)
-            addFilter(categories, data)
-            showData(data)
-         })
-   })
-}
-
-main() */
-
-// old_fetch('http://localhost:5678/api/works')
-//    .then((res) => {
-//       if (res.ok) {
-//          return res.json()
-//         }
-//       })
-//       .then((data) => {
-//         const categoriesList = new Set(data.map((data) => data.category.name))
-//         const galleryNode = qs('.gallery')
-//         appendNewFilterDefault(data, '#projectsFilters', galleryNode)
-//         appendNewFilter(data, '#projectsFilters', 'Tous', galleryNode)
-//         categoriesList.forEach((category) => {
-//           appendNewFilter(data, '#projectsFilters', category, galleryNode)
-//         })
-//    })
-
-// function appendNewFilterDefault(works, elementId, elementNode) {
-//    const selectedElement = qs(elementId)
-//    works.forEach((work) => {
-//       appendNewFigure(elementNode, work)
-//    })
-// }
-
-// /**
-//  *
-//  * @param {*} works => fetch result
-//  * @param {string} elementId
-//  * @param {*} categoryName
-//  * @param {*} elementNode
-//  */
-// function appendNewFilter(works, elementId, categoryName, elementNode) {
-//    const selectedElement = qs(elementId)
-//    const newFilter = createElement('button', {
-//       text: categoryName,
-//       class: 'filter',
-//    })
-//    newFilter.addEventListener('click', () => {
-//       if (categoryName != 'Tous') {
-//          const filteredWorks = works.filter((work) => {
-//             return work.category.name === categoryName
-//          })
-//          elementNode.innerHTML = ''
-//          filteredWorks.forEach((work) => {
-//             appendNewFigure(elementNode, work)
-//          })
-//       } else {
-//          elementNode.innerHTML = ''
-//          works.forEach((work) => {
-//             appendNewFigure(elementNode, work)
-//          })
-//       }
-//    })
-//    selectedElement.appendChild(newFilter)
-// }
+      async function userLogin() {
+      } */
