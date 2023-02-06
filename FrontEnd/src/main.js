@@ -133,14 +133,33 @@ function appendFullThumbnail(nodeElement, work) {
    })
    const newDeleteButton = createElement('button', {
       class: 'delete-work',
+      dataset: { id: work.id },
    })
    const newTrashIcon = createElement('i', {
       class: 'fa-solid fa-trash-can',
    })
 
+   newDeleteButton.addEventListener('click', () => {
+      const workDeleteTarget = newDeleteButton.dataset.id
+      deleteWork(workDeleteTarget)
+   })
    newDeleteButton.appendChild(newTrashIcon)
    newFigure.append(newDeleteButton, newEditLink)
    nodeElement.appendChild(newFigure)
+}
+
+async function deleteWork(workId) {
+   try {
+      const response = await fetch(`${BASE_URL}/users/works/${workId}`, {
+         method: 'DELETE',
+         headers: {
+            Authorization: sessionStorage.getItem('userToken'),
+         },
+      })
+      console.log(response)
+   } catch (error) {
+      console.log(error)
+   }
 }
 
 /* LOCAL STORAGE SESSION */
