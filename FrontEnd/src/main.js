@@ -1,10 +1,6 @@
-import { createElement, qs, qsa, BASE_URL } from './utilities.js'
+import { createElement, qs, BASE_URL } from './utilities.js'
 
-try {
-   showWorks()
-} catch (error) {
-   console.log(error)
-}
+document.addEventListener('DOMContentLoaded', onLoad())
 
 /**
  * GET request and display of works
@@ -22,18 +18,18 @@ async function showWorks() {
 
 /**
  * Creates the basics of a figure element, with an image
- * @param {} data
+ * @param {} work
  * @returns
  */
-function createBasicFigure(data) {
-   const newFigure = createElement('figure')
-   const newImage = createElement('img', {
-      src: data.imageUrl,
-      alt: data.title,
+function createFigureBase(work) {
+   const figure = createElement('figure')
+   const image = createElement('img', {
+      src: work.imageUrl,
+      alt: work.title,
       crossorigin: 'anonymous',
    })
-   newFigure.append(newImage)
-   return newFigure
+   figure.append(image)
+   return figure
 }
 
 /**
@@ -43,13 +39,13 @@ function createBasicFigure(data) {
  * @param {any} work
  */
 const appendFullFigure = (nodeElement, work) => {
-   const newFigure = createBasicFigure(work)
-   const newFigcaption = createElement('figcaption', {
+   const figure = createFigureBase(work)
+   const figcaption = createElement('figcaption', {
       text: work.title,
    })
 
-   newFigure.append(newFigcaption)
-   nodeElement.appendChild(newFigure)
+   figure.append(figcaption)
+   nodeElement.appendChild(figure)
 }
 
 /**
@@ -76,10 +72,10 @@ function addListOnFilterToggle(category, name, data) {
 
 /**
  * Filters data with matching filter (default = null) and creates new figure for each one
- * @param {array} datas
+ * @param {array} works
  * @param {string} filter
  */
-function showData(datas, filter = null) {
+function showData(works, filter = null) {
    const galleryNode = qs('.gallery')
 
    while (galleryNode.firstChild) {
@@ -87,12 +83,12 @@ function showData(datas, filter = null) {
    }
 
    if (filter) {
-      datas = datas.filter((work) => {
+      works = works.filter((work) => {
          return work.category.name === filter
       })
    }
-   datas.forEach((data) => {
-      appendFullFigure(galleryNode, data)
+   works.forEach((work) => {
+      appendFullFigure(galleryNode, work)
    })
 }
 
@@ -105,55 +101,58 @@ function addFilter(categories, data) {
    const filterBar = qs('#projectsFilters')
    const categoryAll = ['Tous', ...categories]
    categoryAll.forEach((element) => {
-      const newFilter = createElement('button', {
+      const filter = createElement('button', {
          text: element,
          class: 'filter',
       })
-      filterBar.appendChild(newFilter)
-      addListOnFilterToggle(newFilter, element, data)
+      filterBar.appendChild(filter)
+      addListOnFilterToggle(filter, element, data)
    })
 }
 
 /* MODAL FUNCTIONS */
 
-function showGalleryModal(datas) {
+function showGalleryModal(works) {
    const galleryNode = qs('.modal-gallery')
+   //maybe while is unecessary
    while (galleryNode.firstChild) {
       galleryNode.firstChild.remove()
    }
-   datas.forEach((data) => {
-      appendFullThumbnail(galleryNode, data)
+   works.forEach((work) => {
+      appendFullThumbnail(galleryNode, work)
    })
 }
 
 function appendFullThumbnail(nodeElement, work) {
-   const newFigure = createBasicFigure(work)
-   const newEditLink = createElement('a', {
+   const figure = createFigureBase(work)
+   const editLink = createElement('a', {
       text: 'éditer',
    })
-   const newDeleteButton = createElement('button', {
+   const deleteButton = createElement('button', {
       class: 'delete-work',
       dataset: { id: work.id },
    })
-   const newTrashIcon = createElement('i', {
-      class: 'fa-solid fa-trash-can',
-   })
-
-   newDeleteButton.addEventListener('click', () => {
-      const workDeleteTarget = newDeleteButton.dataset.id
+   deleteButton.addEventListener('click', (e) => {
+      e.preventDefault()
+      console.log(e.cancelable)
+      const workDeleteTarget = deleteButton.dataset.id
       deleteWork(workDeleteTarget)
    })
-   newDeleteButton.appendChild(newTrashIcon)
-   newFigure.append(newDeleteButton, newEditLink)
-   nodeElement.appendChild(newFigure)
+   const trashIcon = createElement('i', {
+      class: 'fa-solid fa-trash-can',
+   })
+   deleteButton.appendChild(trashIcon)
+   figure.append(deleteButton, editLink)
+   nodeElement.appendChild(figure)
 }
 
 async function deleteWork(workId) {
    try {
-      const response = await fetch(`${BASE_URL}/users/works/${workId}`, {
+      const token = sessionStorage.getItem('userToken')
+      const response = await fetch(`${BASE_URL}/works/${workId}`, {
          method: 'DELETE',
          headers: {
-            Authorization: sessionStorage.getItem('userToken'),
+            Authorization: `Bearer ${token}`,
          },
       })
       console.log(response)
@@ -164,38 +163,46 @@ async function deleteWork(workId) {
 
 /* LOCAL STORAGE SESSION */
 
-if (sessionStorage.getItem('userToken')) {
-   addModifyBanner('body', 'header')
-   addModifyLink('.modify-banner', 'Mode édition', 'button')
-   addModifyLink('#introduction-photo')
-   addModifyLink('#introduction-text', undefined, 'h2')
-   addModifyLink('#portfolio-title')
+function onLoad() {
+   if (sessionStorage.getItem('userToken')) {
+      addModifyBanner('body', 'header')
+      addModifyLink('.modify-banner', 'Mode édition', 'button')
+      addModifyLink('#introduction-photo')
+      addModifyLink('#introduction-text', undefined, 'h2')
+      addModifyLink('#portfolio-title')
 
-   const modal = qs('.modal')
-   const overlay = qs('.overlay')
-   const openModalBtn = qs('.btn-open')
-   const closeModalBtn = qs('.btn-close')
-   const logoutBtn = qs('.apply-changes')
+      const modal = qs('.modal')
+      const overlay = qs('.overlay')
+      const openModalBtn = qs('.btn-open')
+      const closeModalBtn = qs('.btn-close')
+      const logoutBtn = qs('.apply-changes')
 
-   const openModal = function () {
-      modal.classList.remove('hidden')
-      overlay.classList.remove('hidden')
+      function openModal() {
+         modal.classList.remove('hidden')
+         overlay.classList.remove('hidden')
+      }
+
+      function closeModal() {
+         modal.classList.add('hidden')
+         overlay.classList.add('hidden')
+      }
+
+      function logout() {
+         sessionStorage.clear()
+         location.reload()
+      }
+
+      openModalBtn.addEventListener('click', openModal)
+      closeModalBtn.addEventListener('click', closeModal)
+      overlay.addEventListener('click', closeModal)
+      logoutBtn.addEventListener('click', logout)
    }
 
-   const closeModal = function () {
-      modal.classList.add('hidden')
-      overlay.classList.add('hidden')
+   try {
+      showWorks()
+   } catch (error) {
+      console.log(error)
    }
-
-   const logout = function () {
-      sessionStorage.clear()
-      location.reload()
-   }
-
-   openModalBtn.addEventListener('click', openModal)
-   closeModalBtn.addEventListener('click', closeModal)
-   overlay.addEventListener('click', closeModal)
-   logoutBtn.addEventListener('click', logout)
 }
 
 /**
@@ -224,35 +231,45 @@ function addModifyBanner(parent, referent) {
  * @param {string} referent
  */
 function addModifyLink(parent, linkText = 'Modifier', referent) {
-   const modifyDiv = createElement('div')
-   const modifyIcon = createElement('i', {
+   const div = createElement('div')
+   const icon = createElement('i', {
       class: 'fa-solid fa-pen-to-square',
    })
-   const modifyLink = createElement('a', {
+   const link = createElement('a', {
       text: linkText,
    })
-   modifyDiv.append(modifyIcon, modifyLink)
+   div.append(icon, link)
 
    const parentElement = qs(parent)
    const referenceElement = qs(referent)
 
    switch (parent) {
       case '#introduction-text' || '.modify-banner':
-         parentElement.insertBefore(modifyDiv, referenceElement)
+         parentElement.insertBefore(div, referenceElement)
          break
 
       case '#portfolio-title':
-         modifyLink.classList = 'btn btn-open'
-         parentElement.appendChild(modifyDiv)
+         link.classList = 'btn btn-open'
+         parentElement.appendChild(div)
          break
 
       default:
-         parentElement.appendChild(modifyDiv)
+         parentElement.appendChild(div)
          break
    }
 }
 
 //A débriefer
+
+/**
+ * Changer fonction addModifyLink => code cyril
+ * Finir requete delete (gestion erreurs)
+ * Formulaire => basculer les elements en dur de la modale dans la génération de la modale
+ * =>créer fonction formulaire pour vider la modale et remplir avec le form
+ * pour le file input, cacher l'input et styliser le label ! (voir createObjectURL)
+ * pour le selecteur, c'est un ul>li, chercher selecteur custom js
+ *
+ */
 
 //Pourquoi le if ne fonctionne pas ?
 /*    if (parent === '#introduction-text' || '.modify-banner') {

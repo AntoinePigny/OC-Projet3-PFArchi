@@ -207,7 +207,7 @@ h2 {
    border-style: none;
    border: 1px solid white;
    cursor: pointer;
-   transition: background-color ease-in 1s;
+   transition: background-color ease-in 0.3s;
 }
 
 .apply-changes:hover {
