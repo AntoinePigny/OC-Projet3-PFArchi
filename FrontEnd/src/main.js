@@ -1,4 +1,4 @@
-import { createElement, qs, BASE_URL } from './utilities.js'
+import { createElement, qs, BASE_URL, qsa } from './utilities.js'
 
 document.addEventListener('DOMContentLoaded', onLoad())
 
@@ -64,9 +64,15 @@ function deleteDuplicates(data) {
  * @param {array} data
  */
 function addListOnFilterToggle(category, name, data) {
-   category.addEventListener('click', () => {
-      if (name !== 'Tous') return showData(data, name)
-      return showData(data)
+   category.addEventListener('click', (e) => {
+      const allFilters = qsa('.filter')
+      allFilters.forEach((filter) => {
+         filter.classList.remove('active')
+      })
+      e.target.classList.add('active')
+      if (name !== 'Tous') {
+         return showData(data, name)
+      } else return showData(data)
    })
 }
 
@@ -98,13 +104,14 @@ function showData(works, filter = null) {
  * @param {array} data
  */
 function addFilter(categories, data) {
-   const filterBar = qs('#projectsFilters')
+   const filterBar = qs('#projects-filters')
    const categoryAll = ['Tous', ...categories]
    categoryAll.forEach((element) => {
       const filter = createElement('button', {
          text: element,
          class: 'filter',
       })
+      if (element === 'Tous') filter.classList.add('active')
       filterBar.appendChild(filter)
       addListOnFilterToggle(filter, element, data)
    })
@@ -132,9 +139,8 @@ function appendFullThumbnail(nodeElement, work) {
       class: 'delete-work',
       dataset: { id: work.id },
    })
-   deleteButton.addEventListener('click', (e) => {
-      e.preventDefault()
-      console.log(e.cancelable)
+   deleteButton.addEventListener('click', (event) => {
+      event.preventDefault()
       const workDeleteTarget = deleteButton.dataset.id
       deleteWork(workDeleteTarget)
    })
@@ -155,7 +161,17 @@ async function deleteWork(workId) {
             Authorization: `Bearer ${token}`,
          },
       })
-      console.log(response)
+      if (response.status === 200) {
+         const modalDiv = qs('.modal-btns')
+         const successMessage = createElement('p', {
+            text: 'Votre élément a été effacé avec succès',
+         })
+         modalDiv.prepend(successMessage)
+      } else if (response.status === 401) {
+         throw 'Vous devez être connectée pour effectuer cette action'
+      } else {
+         throw 'Erreur inattendue'
+      }
    } catch (error) {
       console.log(error)
    }
@@ -263,7 +279,6 @@ function addModifyLink(parent, linkText = 'Modifier', referent) {
 
 /**
  * Changer fonction addModifyLink => code cyril
- * Finir requete delete (gestion erreurs)
  * Formulaire => basculer les elements en dur de la modale dans la génération de la modale
  * =>créer fonction formulaire pour vider la modale et remplir avec le form
  * pour le file input, cacher l'input et styliser le label ! (voir createObjectURL)
@@ -284,3 +299,52 @@ function addModifyLink(parent, linkText = 'Modifier', referent) {
 /* 
       async function userLogin() {
       } */
+
+/*       const modifiers = [
+         {
+            container: qs('#introduction-text'),
+            isAtStart: true,
+            isClickable: false,
+         },
+         {
+            container: qs('#portfolio-title'),
+            isAtStart: false,
+            isClickable: true,
+         },
+         {
+            container: qs('#introduction-photo'),
+            isAtStart: false,
+            isClickable: false,
+         },
+      ]
+
+      function addModifyLink({ container, isAtStart, isClickable }) {
+         const div = createElement('div')
+         const icon = createElement('i', {
+            class: 'fa-solid fa-pen-to-square',
+         })
+         const link = createElement('a', {
+            text: 'modifier',
+         })
+         div.append(icon, link)
+
+         if (isClickable) {
+            // add classes to button
+            const arr = ['btn', 'btn-open']
+            div.classList.add(...arr)
+
+            // add event listener to open modal
+            div.addEventListener('click', openModal())
+         }
+
+         if (isAtStart) {
+            container.prepend(div)
+         } else {
+            container.appendChild(div)
+         }
+      }
+modifiers.forEach((modifier) => {
+         console.log(modifier.container)
+         //addModifyLink(modifier.container, modifier.isAtStart, modifier.isClickable)
+      })
+   } */

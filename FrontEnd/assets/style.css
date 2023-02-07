@@ -264,6 +264,30 @@ a:hover {
    cursor: pointer;
 }
 
+#projects-filters {
+   display: flex;
+   justify-content: center;
+   gap: 0.6rem;
+   margin-bottom: 3rem;
+}
+
+.filter {
+   font-family: 'Syne';
+   font-weight: 700;
+   font-size: 1rem;
+   color: #1d6154;
+   background-color: #fff;
+   border: 1px solid #1d6154;
+   border-radius: 60px;
+   padding: 0.6rem 1rem;
+   cursor: pointer;
+}
+
+.active {
+   background-color: #1d6154;
+   color: #fff;
+}
+
 #portfolio h2 {
    text-align: center;
    display: flex;
@@ -390,6 +414,11 @@ input[type='submit'] {
    font-size: 1.75rem;
    cursor: pointer;
    background: none;
+}
+
+.modal-btns input {
+   border: none;
+   cursor: pointer;
 }
 
 .modal-gallery {
