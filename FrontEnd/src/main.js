@@ -182,31 +182,32 @@ async function deleteWork(workId) {
 function onLoad() {
    if (sessionStorage.getItem('userToken')) {
       addModifyBanner('body', 'header')
-      addModifyLink('.modify-banner', 'Mode édition', 'button')
-      addModifyLink('#introduction-photo')
-      addModifyLink('#introduction-text', undefined, 'h2')
-      addModifyLink('#portfolio-title')
+      const modifiers = [
+         {
+            container: '#introduction-text',
+            isAtStart: true,
+            isClickable: false,
+         },
+         {
+            container: '#portfolio-title',
+            isAtStart: false,
+            isClickable: true,
+         },
+         {
+            container: '#introduction-photo',
+            isAtStart: false,
+            isClickable: false,
+         },
+      ]
+      modifiers.forEach((modifier) => {
+         console.log(modifier.container)
+         addModifyLink(modifier.container, modifier.isAtStart, modifier.isClickable)
+      })
 
-      const modal = qs('.modal')
       const overlay = qs('.overlay')
       const openModalBtn = qs('.btn-open')
       const closeModalBtn = qs('.btn-close')
       const logoutBtn = qs('.apply-changes')
-
-      function openModal() {
-         modal.classList.remove('hidden')
-         overlay.classList.remove('hidden')
-      }
-
-      function closeModal() {
-         modal.classList.add('hidden')
-         overlay.classList.add('hidden')
-      }
-
-      function logout() {
-         sessionStorage.clear()
-         location.reload()
-      }
 
       openModalBtn.addEventListener('click', openModal)
       closeModalBtn.addEventListener('click', closeModal)
@@ -221,6 +222,24 @@ function onLoad() {
    }
 }
 
+function openModal() {
+   const modal = qs('.modal')
+   const overlay = qs('.overlay')
+   modal.classList.remove('hidden')
+   overlay.classList.remove('hidden')
+}
+
+function closeModal() {
+   const modal = qs('.modal')
+   const overlay = qs('.overlay')
+   modal.classList.add('hidden')
+   overlay.classList.add('hidden')
+}
+
+function logout() {
+   sessionStorage.clear()
+   location.reload()
+}
 /**
  * Adds banner
  * @param {*} parent
@@ -234,44 +253,44 @@ function addModifyBanner(parent, referent) {
       class: 'apply-changes',
       text: 'publier les changements',
    })
-   modifyBanner.appendChild(applyChangesButton)
+   const div = createElement('div')
+   const icon = createElement('i', {
+      class: 'fa-solid fa-pen-to-square',
+   })
+   const text = createElement('span', {
+      text: 'Mode édition',
+   })
+   div.append(icon, text)
+
+   modifyBanner.append(applyChangesButton, div)
    const referenceElement = qs(referent)
    const parentElement = qs(parent)
    parentElement.insertBefore(modifyBanner, referenceElement)
 }
 
-/**
- * Adds a modify link and icon
- * @param {string} parent
- * @param {string} linkText
- * @param {string} referent
- */
-function addModifyLink(parent, linkText = 'Modifier', referent) {
+function addModifyLink(containerString, isAtStart, isClickable) {
    const div = createElement('div')
    const icon = createElement('i', {
       class: 'fa-solid fa-pen-to-square',
    })
    const link = createElement('a', {
-      text: linkText,
+      text: 'modifier',
    })
    div.append(icon, link)
 
-   const parentElement = qs(parent)
-   const referenceElement = qs(referent)
+   if (isClickable) {
+      // add classes to button
+      const arr = ['btn', 'btn-open']
+      div.classList.add(...arr)
 
-   switch (parent) {
-      case '#introduction-text' || '.modify-banner':
-         parentElement.insertBefore(div, referenceElement)
-         break
-
-      case '#portfolio-title':
-         link.classList = 'btn btn-open'
-         parentElement.appendChild(div)
-         break
-
-      default:
-         parentElement.appendChild(div)
-         break
+      // add event listener to open modal
+      div.addEventListener('click', openModal())
+   }
+   const container = qs(containerString)
+   if (isAtStart) {
+      container.prepend(div)
+   } else {
+      container.appendChild(div)
    }
 }
 
@@ -285,66 +304,3 @@ function addModifyLink(parent, linkText = 'Modifier', referent) {
  * pour le selecteur, c'est un ul>li, chercher selecteur custom js
  *
  */
-
-//Pourquoi le if ne fonctionne pas ?
-/*    if (parent === '#introduction-text' || '.modify-banner') {
-         console.log(modifyLink)
-         parentElement.insertBefore(modifyDiv, referenceElement)
-      } else if (parent === '#portfolio-title') {
-         console.log(4)
-      } else {
-         parentElement.appendChild(modifyDiv)
-      } */
-
-/* 
-      async function userLogin() {
-      } */
-
-/*       const modifiers = [
-         {
-            container: qs('#introduction-text'),
-            isAtStart: true,
-            isClickable: false,
-         },
-         {
-            container: qs('#portfolio-title'),
-            isAtStart: false,
-            isClickable: true,
-         },
-         {
-            container: qs('#introduction-photo'),
-            isAtStart: false,
-            isClickable: false,
-         },
-      ]
-
-      function addModifyLink({ container, isAtStart, isClickable }) {
-         const div = createElement('div')
-         const icon = createElement('i', {
-            class: 'fa-solid fa-pen-to-square',
-         })
-         const link = createElement('a', {
-            text: 'modifier',
-         })
-         div.append(icon, link)
-
-         if (isClickable) {
-            // add classes to button
-            const arr = ['btn', 'btn-open']
-            div.classList.add(...arr)
-
-            // add event listener to open modal
-            div.addEventListener('click', openModal())
-         }
-
-         if (isAtStart) {
-            container.prepend(div)
-         } else {
-            container.appendChild(div)
-         }
-      }
-modifiers.forEach((modifier) => {
-         console.log(modifier.container)
-         //addModifyLink(modifier.container, modifier.isAtStart, modifier.isClickable)
-      })
-   } */

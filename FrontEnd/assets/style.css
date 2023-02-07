@@ -447,6 +447,7 @@ input[type='submit'] {
    border: none;
    display: flex;
    padding: 4px;
+   cursor: pointer;
 }
 
 .modal-gallery i {
