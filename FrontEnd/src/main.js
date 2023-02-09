@@ -84,9 +84,7 @@ function addListOnFilterToggle(category, name, data) {
 function showData(works, filter = null) {
    const galleryNode = qs('.gallery')
 
-   while (galleryNode.firstChild) {
-      galleryNode.firstChild.remove()
-   }
+   galleryNode.replaceChildren()
 
    if (filter) {
       works = works.filter((work) => {
@@ -121,10 +119,7 @@ function addFilter(categories, data) {
 
 function showGalleryModal(works) {
    const galleryNode = qs('.modal-gallery')
-   //maybe while is unecessary
-   while (galleryNode.firstChild) {
-      galleryNode.firstChild.remove()
-   }
+   galleryNode.replaceChildren()
    works.forEach((work) => {
       appendFullThumbnail(galleryNode, work)
    })
@@ -137,12 +132,6 @@ function appendFullThumbnail(nodeElement, work) {
    })
    const deleteButton = createElement('button', {
       class: 'delete-work',
-      dataset: { id: work.id },
-   })
-   deleteButton.addEventListener('click', (event) => {
-      event.preventDefault()
-      const workDeleteTarget = deleteButton.dataset.id
-      deleteWork(workDeleteTarget)
    })
    const trashIcon = createElement('i', {
       class: 'fa-solid fa-trash-can',
@@ -150,6 +139,14 @@ function appendFullThumbnail(nodeElement, work) {
    deleteButton.appendChild(trashIcon)
    figure.append(deleteButton, editLink)
    nodeElement.appendChild(figure)
+   deleteButton.addEventListener('click', async (event) => {
+      event.preventDefault()
+      await deleteWork(work.id)
+      const response = await fetch(`${BASE_URL}/works`)
+      const works = await response.json()
+      showData(works)
+      showGalleryModal(works)
+   })
 }
 
 async function deleteWork(workId) {
@@ -161,16 +158,22 @@ async function deleteWork(workId) {
             Authorization: `Bearer ${token}`,
          },
       })
-      if (response.status === 200) {
+      if (response.status === 204) {
          const modalDiv = qs('.modal-btns')
-         const successMessage = createElement('p', {
+         const newMessage = createElement('p', {
+            class: 'delete-message',
             text: 'Votre élément a été effacé avec succès',
          })
-         modalDiv.prepend(successMessage)
+         const existingMessage = qs('.delete-message')
+         if (existingMessage) {
+            existingMessage.replaceWith(newMessage)
+         } else {
+            modalDiv.prepend(newMessage)
+         }
       } else if (response.status === 401) {
          throw 'Vous devez être connectée pour effectuer cette action'
       } else {
-         throw 'Erreur inattendue'
+         throw console.log(response.status)
       }
    } catch (error) {
       console.log(error)
@@ -200,16 +203,13 @@ function onLoad() {
          },
       ]
       modifiers.forEach((modifier) => {
-         console.log(modifier.container)
          addModifyLink(modifier.container, modifier.isAtStart, modifier.isClickable)
       })
 
       const overlay = qs('.overlay')
-      const openModalBtn = qs('.btn-open')
       const closeModalBtn = qs('.btn-close')
       const logoutBtn = qs('.apply-changes')
 
-      openModalBtn.addEventListener('click', openModal)
       closeModalBtn.addEventListener('click', closeModal)
       overlay.addEventListener('click', closeModal)
       logoutBtn.addEventListener('click', logout)
@@ -284,7 +284,7 @@ function addModifyLink(containerString, isAtStart, isClickable) {
       div.classList.add(...arr)
 
       // add event listener to open modal
-      div.addEventListener('click', openModal())
+      div.addEventListener('click', openModal)
    }
    const container = qs(containerString)
    if (isAtStart) {
@@ -297,7 +297,6 @@ function addModifyLink(containerString, isAtStart, isClickable) {
 //A débriefer
 
 /**
- * Changer fonction addModifyLink => code cyril
  * Formulaire => basculer les elements en dur de la modale dans la génération de la modale
  * =>créer fonction formulaire pour vider la modale et remplir avec le form
  * pour le file input, cacher l'input et styliser le label ! (voir createObjectURL)
