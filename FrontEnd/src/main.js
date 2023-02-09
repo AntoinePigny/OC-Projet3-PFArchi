@@ -22,7 +22,9 @@ async function showWorks() {
  * @returns
  */
 function createFigureBase(work) {
-   const figure = createElement('figure')
+   const figure = createElement('figure', {
+      dataset: { id: work.id },
+   })
    const image = createElement('img', {
       src: work.imageUrl,
       alt: work.title,
@@ -83,9 +85,7 @@ function addListOnFilterToggle(category, name, data) {
  */
 function showData(works, filter = null) {
    const galleryNode = qs('.gallery')
-
    galleryNode.replaceChildren()
-
    if (filter) {
       works = works.filter((work) => {
          return work.category.name === filter
@@ -119,13 +119,10 @@ function addFilter(categories, data) {
 
 function showGalleryModal(works) {
    const galleryNode = qs('.modal-gallery')
-   galleryNode.replaceChildren()
-   works.forEach((work) => {
-      appendFullThumbnail(galleryNode, work)
-   })
+   galleryNode.replaceChildren(...works.map(createFullThumbnail))
 }
 
-function appendFullThumbnail(nodeElement, work) {
+function createFullThumbnail(work) {
    const figure = createFigureBase(work)
    const editLink = createElement('a', {
       text: 'éditer',
@@ -138,15 +135,11 @@ function appendFullThumbnail(nodeElement, work) {
    })
    deleteButton.appendChild(trashIcon)
    figure.append(deleteButton, editLink)
-   nodeElement.appendChild(figure)
-   deleteButton.addEventListener('click', async (event) => {
+   deleteButton.addEventListener('click', (event) => {
       event.preventDefault()
-      await deleteWork(work.id)
-      const response = await fetch(`${BASE_URL}/works`)
-      const works = await response.json()
-      showData(works)
-      showGalleryModal(works)
+      deleteWork(work.id)
    })
+   return figure
 }
 
 async function deleteWork(workId) {
@@ -165,6 +158,10 @@ async function deleteWork(workId) {
             text: 'Votre élément a été effacé avec succès',
          })
          const existingMessage = qs('.delete-message')
+         const workNodes = qsa(`figure[data-id = "${workId}"]`)
+         workNodes.forEach((workNode) => {
+            workNode.remove()
+         })
          if (existingMessage) {
             existingMessage.replaceWith(newMessage)
          } else {
