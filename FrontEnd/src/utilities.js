@@ -48,4 +48,13 @@ export function qsa(selector, parent = document) {
    return [...parent.querySelectorAll(selector)]
 }
 
+export function createLabel(input, className, value = null) {
+   const label = createElement('label', {
+      for: input,
+      class: className,
+      text: value,
+   })
+   return label
+}
+
 export const BASE_URL = 'http://localhost:5678/api'

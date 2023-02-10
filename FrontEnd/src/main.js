@@ -1,4 +1,4 @@
-import { createElement, qs, BASE_URL, qsa } from './utilities.js'
+import { createElement, qs, BASE_URL, qsa, createLabel } from './utilities.js'
 
 document.addEventListener('DOMContentLoaded', onLoad())
 
@@ -11,10 +11,10 @@ async function showWorks() {
    const categories = deleteDuplicates(works)
    addFilter(categories, works)
    showData(works)
-   showGalleryModal(works)
+   showModalGallery(works)
 }
 
-// WORKS FILTER FUNCTIONS
+/* SHOW WORKS & FILTER FUNCTIONS (main gallery)*/
 
 /**
  * Creates the basics of a figure element, with an image
@@ -117,9 +117,43 @@ function addFilter(categories, data) {
 
 /* MODAL FUNCTIONS */
 
-function showGalleryModal(works) {
-   const galleryNode = qs('.modal-gallery')
+function createModal(titleText) {
+   const section = qs('.modal')
+   const title = createElement('h3', {
+      text: titleText,
+   })
+   const btnsContainer = createElement('div', {
+      class: 'modal-btns',
+   })
+   const closeBtn = createElement('button', {
+      text: '⨯',
+      class: 'btn-close',
+   })
+   section.append(title, btnsContainer, closeBtn)
+   closeBtn.addEventListener('click', closeModal)
+}
+
+/* Modal gallery and work deletion */
+
+function showModalGallery(works) {
+   const modal = qs('.modal')
+   modal.replaceChildren()
+   createModal('Galerie Photo')
+   const galleryNode = createElement('div', {
+      class: 'modal-gallery',
+   })
+   const btnsContainer = qs('.modal-btns')
+   const toFormBtn = createElement('input', {
+      type: 'submit',
+      value: 'Ajouter une photo',
+   })
+   const deleteAllWorks = createElement('a', {
+      text: 'Supprimer la galerie',
+   })
    galleryNode.replaceChildren(...works.map(createFullThumbnail))
+   btnsContainer.prepend(galleryNode)
+   btnsContainer.append(toFormBtn, deleteAllWorks)
+   //toFormBtn.addEventListener('click', showModalForm(works))
 }
 
 function createFullThumbnail(work) {
@@ -177,6 +211,121 @@ async function deleteWork(workId) {
    }
 }
 
+/* Modal form for new work */
+
+/* function showModalForm(works) {
+   console.log(works)
+   const modal = qs('.modal')
+   modal.replaceChildren()
+   createModal('Ajout photo')
+   const form = createElement('form', {
+      id: 'new-work-form',
+   })
+   const photoLabel = createLabel('add-photo', 'add-photo-label')
+   const photoInput = createElement('input', {
+      type: 'file',
+      id: 'add-photo',
+      class: 'hidden',
+   })
+   const titleLabel = createLabel('photo-title', 'photo-title-label', 'Titre')
+   const titleInput = createElement('input', {
+      type: 'text',
+      id: 'photo-title',
+   })
+   const categoryLabel = createElement('p', {
+      text: 'Catégorie',
+   })
+   const submit = createElement('input', {
+      type: 'submit',
+      value: 'Valider',
+   })
+   form.append(photoLabel, photoInput, titleLabel, titleInput, categoryLabel)
+   //const categories = deleteDuplicates(works.category)
+   console.log(works)
+   //dropdown(categories)
+   const btnsContainer = qs('.modal-btns')
+   btnsContainer.appendChild(submit)
+   form.appendChild(btnsContainer)
+}
+
+function dropdown(categories) {
+   const form = qs('#new-work-form')
+   const component = createElement('div')
+
+   const input = createInput()
+   const dropdown = showDropdown(categories)
+
+   component.appendChild(input)
+   component.appendChild(dropdown)
+   form.appendChild(component)
+}
+
+function createInput() {
+   // Creates the input outline
+   const input = createElement('div', {
+      class: 'input',
+   })
+   input.addEventListener('click', toggleDropdown)
+
+   // Creates the input placeholder content
+   const inputPlaceholder = createElement('div', {
+      class: 'input-placeholder',
+   })
+
+   const placeholder = createElement('p', {
+      text: 'Catégorie',
+      class: 'placeholder',
+   })
+
+   const dropdownIcon = createElement('i', {
+      class: 'fa-regular fa-chevron-down',
+   })
+
+   // Appends the placeholder and chevron (stored in assets.js)
+   inputPlaceholder.appendChild(placeholder)
+   inputPlaceholder.appendChild(dropdownIcon)
+   input.appendChild(inputPlaceholder)
+
+   return input
+}
+
+function showDropdown(categories) {
+   const structure = createElement('div', {
+      class: 'structure hide',
+   })
+
+   categories.forEach((category) => {
+      const { id, name } = category
+      const option = createElement('div', {
+         id: id,
+      })
+      option.addEventListener('click', () => selectOption(name))
+
+      const n = createElement('h5', {
+         text: name,
+      })
+
+      option.appendChild(n)
+      structure.appendChild(option)
+   })
+   return structure
+}
+
+function toggleDropdown() {
+   const dropdown = qs('.structure')
+   dropdown.classList.toggle('hide')
+
+   const input = qs('.input')
+   input.classList.toggle('input-active')
+}
+
+function selectOption(name) {
+   const text = qs('.placeholder')
+   text.textContent = name
+   text.classList.add('input-selected')
+   toggleDropdown()
+} */
+
 /* LOCAL STORAGE SESSION */
 
 function onLoad() {
@@ -204,10 +353,8 @@ function onLoad() {
       })
 
       const overlay = qs('.overlay')
-      const closeModalBtn = qs('.btn-close')
       const logoutBtn = qs('.apply-changes')
 
-      closeModalBtn.addEventListener('click', closeModal)
       overlay.addEventListener('click', closeModal)
       logoutBtn.addEventListener('click', logout)
    }
@@ -294,8 +441,6 @@ function addModifyLink(containerString, isAtStart, isClickable) {
 //A débriefer
 
 /**
- * Formulaire => basculer les elements en dur de la modale dans la génération de la modale
- * =>créer fonction formulaire pour vider la modale et remplir avec le form
  * pour le file input, cacher l'input et styliser le label ! (voir createObjectURL)
  * pour le selecteur, c'est un ul>li, chercher selecteur custom js
  *
