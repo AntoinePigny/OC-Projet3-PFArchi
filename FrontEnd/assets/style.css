@@ -392,13 +392,13 @@ input[type='submit'] {
    align-items: center;
    width: 630px;
    padding-block: 60px;
-   justify-content: space-between;
+   justify-content: space-around;
    min-height: 400px;
-   gap: 1.875rem;
    border-radius: 10px;
    margin: 0;
    z-index: 2;
    background-color: #fff;
+   gap: 2rem;
 }
 
 .modal h3 {
@@ -426,8 +426,7 @@ input[type='submit'] {
    display: grid;
    grid-template-columns: repeat(5, 1fr);
    gap: 0.5rem;
-   padding-bottom: 3.75rem;
-   border-bottom: 1px solid #b3b3b3;
+   padding-bottom: 3rem;
 }
 
 .modal-gallery figure {
@@ -459,6 +458,9 @@ input[type='submit'] {
    flex-direction: column;
    align-items: center;
    gap: 1.5rem;
+   border-top: 1px solid #b3b3b3;
+   padding-top: 2.5rem;
+   width: 420px;
 }
 
 .modal-btns input {
@@ -478,6 +480,148 @@ input[type='submit'] {
    background: rgba(0, 0, 0, 0.5);
    backdrop-filter: blur(3px);
    z-index: 1;
+}
+
+/* Form styling
+*/
+.modal:has(#new-work-form) {
+   justify-content: stretch;
+}
+
+#new-work-form {
+   display: flex;
+   flex-direction: column;
+}
+
+#new-work-form label,
+#new-work-form > p {
+   padding-block: 21px 10px;
+}
+
+.btn-prev {
+   position: absolute;
+   left: 2.25rem;
+   top: 2rem;
+   border: none;
+   padding: 0;
+   font-size: 1.75rem;
+   cursor: pointer;
+   background: none;
+}
+
+/* Input styling */
+
+#new-work-form .add-photo-label {
+   padding-block: 0;
+   border-radius: 3px;
+   width: 420px;
+   height: 169px;
+   background-color: #e8f1f7;
+   cursor: pointer;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 0.5rem;
+}
+
+.photo-icon {
+   font-size: 5rem;
+   color: #b9c5cc;
+}
+
+.add-photo-label p {
+   padding: 0.6rem 2rem;
+   border-radius: 50px;
+   background-color: #cbd6dc;
+   color: #306685;
+   font-weight: 500;
+}
+
+.add-photo-label span {
+   font-size: 0.6rem;
+   color: #444444;
+}
+
+#thumb-id {
+   max-height: 100%;
+}
+
+.input,
+#photo-title {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   width: 388px;
+   padding: 1rem;
+   background-color: white;
+   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+   font-size: 14px;
+   color: #444444;
+   border: none;
+}
+
+.select-wrapper {
+   margin-bottom: 3rem;
+}
+
+.input-active {
+   border-color: var(--colorAccent);
+   border-bottom-left-radius: 0px !important;
+   border-bottom-right-radius: 0px !important;
+}
+
+.input-placeholder {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.input:hover {
+   cursor: pointer;
+}
+
+.placeholder {
+   color: var(--colorPlaceholder);
+}
+
+.input-selected {
+   color: var(--colorPrimaryDark);
+}
+
+/* Dropdown styling */
+.structure {
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-start;
+   width: 420px;
+   overflow: visible;
+   background-color: white;
+   padding: 10px 0;
+}
+
+.structure > div {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   padding: 16px;
+}
+
+.structure > div:hover {
+   background-color: #b1663c;
+   color: white;
+   cursor: pointer;
+}
+
+.structure > div > h5 {
+   margin-right: 4px;
+}
+
+.structure > div > p {
+   font-weight: 400;
+   font-size: 13px;
+   color: var(--colorPlaceholder);
 }
 
 .hidden {

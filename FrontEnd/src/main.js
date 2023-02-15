@@ -151,9 +151,9 @@ function showModalGallery(works) {
       text: 'Supprimer la galerie',
    })
    galleryNode.replaceChildren(...works.map(createFullThumbnail))
-   btnsContainer.prepend(galleryNode)
+   modal.insertBefore(galleryNode, btnsContainer)
    btnsContainer.append(toFormBtn, deleteAllWorks)
-   //toFormBtn.addEventListener('click', showModalForm(works))
+   toFormBtn.addEventListener('click', showModalForm)
 }
 
 function createFullThumbnail(work) {
@@ -213,8 +213,7 @@ async function deleteWork(workId) {
 
 /* Modal form for new work */
 
-/* function showModalForm(works) {
-   console.log(works)
+async function showModalForm() {
    const modal = qs('.modal')
    modal.replaceChildren()
    createModal('Ajout photo')
@@ -222,13 +221,35 @@ async function deleteWork(workId) {
       id: 'new-work-form',
    })
    const photoLabel = createLabel('add-photo', 'add-photo-label')
+   const photoIcon = createElement('i', {
+      class: 'fa-solid fa-image photo-icon',
+   })
+   const photoBtn = createElement('p', {
+      text: '+ Ajouter photo',
+   })
+   const photoSpan = createElement('span', {
+      text: 'jpg, png : 4mo max',
+   })
+   photoLabel.append(photoIcon, photoBtn, photoSpan)
    const photoInput = createElement('input', {
+      name: 'image',
       type: 'file',
       id: 'add-photo',
       class: 'hidden',
    })
+   photoInput.onchange = (e) => {
+      const [file] = photoInput.files
+      if (file) {
+         const photoThumb = createElement('img', {
+            id: 'thumb-id',
+            src: URL.createObjectURL(file),
+         })
+         photoLabel.replaceChildren(photoThumb)
+      }
+   }
    const titleLabel = createLabel('photo-title', 'photo-title-label', 'Titre')
    const titleInput = createElement('input', {
+      name: 'title',
       type: 'text',
       id: 'photo-title',
    })
@@ -239,25 +260,35 @@ async function deleteWork(workId) {
       type: 'submit',
       value: 'Valider',
    })
+
+   const previousBtn = createElement('button', {
+      text: '🡐',
+      class: 'btn-prev',
+   })
+   previousBtn.addEventListener('click', previousModal)
    form.append(photoLabel, photoInput, titleLabel, titleInput, categoryLabel)
-   //const categories = deleteDuplicates(works.category)
-   console.log(works)
-   //dropdown(categories)
+   await dropdown(form)
    const btnsContainer = qs('.modal-btns')
    btnsContainer.appendChild(submit)
    form.appendChild(btnsContainer)
+   submit.addEventListener('click', (event) => {
+      event.preventDefault()
+      const formData = new FormData(form)
+      console.log(formData)
+   })
+   modal.append(form, previousBtn)
 }
 
-function dropdown(categories) {
-   const form = qs('#new-work-form')
-   const component = createElement('div')
-
+async function dropdown(element) {
+   const component = createElement('div', {
+      class: 'select-wrapper',
+   })
    const input = createInput()
-   const dropdown = showDropdown(categories)
-
+   const dropdown = await showDropdown()
    component.appendChild(input)
    component.appendChild(dropdown)
-   form.appendChild(component)
+   element.appendChild(component)
+   return element
 }
 
 function createInput() {
@@ -289,11 +320,12 @@ function createInput() {
    return input
 }
 
-function showDropdown(categories) {
+async function showDropdown() {
    const structure = createElement('div', {
-      class: 'structure hide',
+      class: 'structure hidden',
    })
-
+   const response = await fetch(`${BASE_URL}/categories`)
+   const categories = await response.json()
    categories.forEach((category) => {
       const { id, name } = category
       const option = createElement('div', {
@@ -313,7 +345,7 @@ function showDropdown(categories) {
 
 function toggleDropdown() {
    const dropdown = qs('.structure')
-   dropdown.classList.toggle('hide')
+   dropdown.classList.toggle('hidden')
 
    const input = qs('.input')
    input.classList.toggle('input-active')
@@ -324,7 +356,7 @@ function selectOption(name) {
    text.textContent = name
    text.classList.add('input-selected')
    toggleDropdown()
-} */
+}
 
 /* LOCAL STORAGE SESSION */
 
@@ -378,6 +410,12 @@ function closeModal() {
    const overlay = qs('.overlay')
    modal.classList.add('hidden')
    overlay.classList.add('hidden')
+}
+
+async function previousModal() {
+   const response = await fetch(`${BASE_URL}/works`)
+   const works = await response.json()
+   showModalGallery(works)
 }
 
 function logout() {
