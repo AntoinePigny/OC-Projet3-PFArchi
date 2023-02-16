@@ -271,10 +271,9 @@ async function showModalForm() {
    const btnsContainer = qs('.modal-btns')
    btnsContainer.appendChild(submit)
    form.appendChild(btnsContainer)
-   submit.addEventListener('click', (event) => {
+   submit.addEventListener('click', async (event) => {
       event.preventDefault()
-      const formData = new FormData(form)
-      console.log(formData)
+      await sendForm(form)
    })
    modal.append(form, previousBtn)
 }
@@ -331,7 +330,7 @@ async function showDropdown() {
       const option = createElement('div', {
          id: id,
       })
-      option.addEventListener('click', () => selectOption(name))
+      option.addEventListener('click', () => selectOption(name, id))
 
       const n = createElement('h5', {
          text: name,
@@ -351,9 +350,10 @@ function toggleDropdown() {
    input.classList.toggle('input-active')
 }
 
-function selectOption(name) {
+function selectOption(name, id) {
    const text = qs('.placeholder')
    text.textContent = name
+   text.dataset.id = id
    text.classList.add('input-selected')
    toggleDropdown()
 }
@@ -395,6 +395,53 @@ function onLoad() {
       showWorks()
    } catch (error) {
       console.log(error)
+   }
+}
+
+async function sendForm(form) {
+   const modalDiv = qs('.modal-btns')
+   const newMessage = createElement('p', {
+      class: 'add-message',
+      text: 'Votre élément a été ajouté avec succès',
+   })
+   const existingMessage = qs('.add-message')
+   try {
+      const formData = new FormData(form)
+      console.log(formData)
+      const category = qs('.input-selected')
+      formData.append('category', category.dataset.id)
+      const token = sessionStorage.getItem('userToken')
+      const response = await fetch(`${BASE_URL}/works`, {
+         method: 'POST',
+         body: formData,
+         headers: {
+            Authorization: `Bearer ${token}`,
+         },
+      })
+      const newWork = await response.json()
+      console.log(newWork)
+      if (response.status === 201) {
+         const galleryNode = qs('.gallery')
+         if (existingMessage) {
+            existingMessage.replaceWith(newMessage)
+         } else {
+            modalDiv.prepend(newMessage)
+         }
+         appendFullFigure(galleryNode, newWork)
+      } else if (response.status === 401) {
+         throw 'Vous devez être connectée pour effectuer cette action'
+      } else if (response.status === 500 || response.status === 400) {
+         throw 'Vous devez remplir tous les champs'
+      } else {
+         throw 'Erreur inattendue'
+      }
+   } catch (error) {
+      newMessage.textContent = error
+      if (existingMessage) {
+         existingMessage.replaceWith(newMessage)
+      } else {
+         modalDiv.prepend(newMessage)
+      }
    }
 }
 
