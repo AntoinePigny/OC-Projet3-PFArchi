@@ -222,7 +222,7 @@ async function showModalForm() {
    })
 
    const photoLabel = createPhotoLabel()
-   const photoInput = createPhotoInput()
+   const photoInput = createPhotoInput(photoLabel)
 
    const title = createTitleModalForm()
 
@@ -231,7 +231,7 @@ async function showModalForm() {
    })
    const categorySelect = await dropdown()
 
-   const submit = await createSubmitModalForm()
+   const submit = await createSubmitModalForm(form)
    const btnsContainer = qs('.modal-btns')
    btnsContainer.appendChild(submit)
 
@@ -260,7 +260,7 @@ function createPhotoLabel() {
    return photoLabel
 }
 
-function createPhotoInput() {
+function createPhotoInput(photoLabel) {
    const photoInput = createElement('input', {
       name: 'image',
       type: 'file',
@@ -375,7 +375,7 @@ function selectOption(name, id) {
 /**
  * Creates modal form buttons
  */
-async function createSubmitModalForm() {
+async function createSubmitModalForm(form) {
    const submit = createElement('input', {
       type: 'submit',
       value: 'Valider',
@@ -445,7 +445,6 @@ async function sendForm(form) {
    const existingMessage = qs('.add-message')
    try {
       const formData = new FormData(form)
-      console.log(formData)
       const category = qs('.input-selected')
       formData.append('category', category.dataset.id)
       const token = sessionStorage.getItem('userToken')
@@ -457,7 +456,6 @@ async function sendForm(form) {
          },
       })
       const newWork = await response.json()
-      console.log(newWork)
       if (response.status === 201) {
          const galleryNode = qs('.gallery')
          if (existingMessage) {
