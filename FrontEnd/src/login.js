@@ -1,8 +1,8 @@
 import { createElement, qs, BASE_URL } from './utilities.js'
-/**
- *Adds event handling login on submit
 
- Ajouter directement les données du form
+/**
+ * Adds event handling login on submit
+ * Ajouter directement les données du form
  */
 function addListenerSendLoginForm() {
    const loginForm = qs('.login-form')
@@ -17,7 +17,7 @@ function addListenerSendLoginForm() {
 }
 
 /**
- *Handles login using post request to API
+ * Handles login using post request to API
  */
 async function handleLoginSubmission(formData) {
    try {

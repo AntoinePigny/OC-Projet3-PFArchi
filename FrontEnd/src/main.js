@@ -211,7 +211,7 @@ async function deleteWork(workId) {
    }
 }
 
-/* Modal form for new work */
+/* MODAL FORM FOR NEW WORK */
 
 async function showModalForm() {
    const modal = qs('.modal')
@@ -220,6 +220,32 @@ async function showModalForm() {
    const form = createElement('form', {
       id: 'new-work-form',
    })
+
+   const photoLabel = createPhotoLabel()
+   const photoInput = createPhotoInput()
+
+   const title = createTitleModalForm()
+
+   const categoryLabel = createElement('p', {
+      text: 'Catégorie',
+   })
+   const categorySelect = await dropdown()
+
+   const submit = await createSubmitModalForm()
+   const btnsContainer = qs('.modal-btns')
+   btnsContainer.appendChild(submit)
+
+   form.append(photoLabel, photoInput, title[0], title[1], categoryLabel, categorySelect, btnsContainer)
+
+   const previousBtn = createPreviousButton()
+   modal.append(form, previousBtn)
+}
+
+/**
+ * Inputs
+ */
+
+function createPhotoLabel() {
    const photoLabel = createLabel('add-photo', 'add-photo-label')
    const photoIcon = createElement('i', {
       class: 'fa-solid fa-image photo-icon',
@@ -231,6 +257,10 @@ async function showModalForm() {
       text: 'jpg, png : 4mo max',
    })
    photoLabel.append(photoIcon, photoBtn, photoSpan)
+   return photoLabel
+}
+
+function createPhotoInput() {
    const photoInput = createElement('input', {
       name: 'image',
       type: 'file',
@@ -247,38 +277,23 @@ async function showModalForm() {
          photoLabel.replaceChildren(photoThumb)
       }
    }
+   return photoInput
+}
+
+function createTitleModalForm() {
    const titleLabel = createLabel('photo-title', 'photo-title-label', 'Titre')
    const titleInput = createElement('input', {
       name: 'title',
       type: 'text',
       id: 'photo-title',
    })
-   const categoryLabel = createElement('p', {
-      text: 'Catégorie',
-   })
-   const submit = createElement('input', {
-      type: 'submit',
-      value: 'Valider',
-   })
-
-   const previousBtn = createElement('button', {
-      text: '🡐',
-      class: 'btn-prev',
-   })
-   previousBtn.addEventListener('click', previousModal)
-   form.append(photoLabel, photoInput, titleLabel, titleInput, categoryLabel)
-   await dropdown(form)
-   const btnsContainer = qs('.modal-btns')
-   btnsContainer.appendChild(submit)
-   form.appendChild(btnsContainer)
-   submit.addEventListener('click', async (event) => {
-      event.preventDefault()
-      await sendForm(form)
-   })
-   modal.append(form, previousBtn)
+   return [titleLabel, titleInput]
 }
 
-async function dropdown(element) {
+/**
+ * Categories Select Creation
+ */
+async function dropdown() {
    const component = createElement('div', {
       class: 'select-wrapper',
    })
@@ -286,8 +301,7 @@ async function dropdown(element) {
    const dropdown = await showDropdown()
    component.appendChild(input)
    component.appendChild(dropdown)
-   element.appendChild(component)
-   return element
+   return component
 }
 
 function createInput() {
@@ -356,6 +370,30 @@ function selectOption(name, id) {
    text.dataset.id = id
    text.classList.add('input-selected')
    toggleDropdown()
+}
+
+/**
+ * Creates modal form buttons
+ */
+async function createSubmitModalForm() {
+   const submit = createElement('input', {
+      type: 'submit',
+      value: 'Valider',
+   })
+   submit.addEventListener('click', async (event) => {
+      event.preventDefault()
+      await sendForm(form)
+   })
+   return submit
+}
+
+function createPreviousButton() {
+   const previousBtn = createElement('button', {
+      text: '🡐',
+      class: 'btn-prev',
+   })
+   previousBtn.addEventListener('click', previousModal)
+   return previousBtn
 }
 
 /* LOCAL STORAGE SESSION */
