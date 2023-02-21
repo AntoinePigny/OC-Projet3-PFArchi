@@ -382,7 +382,7 @@ async function createSubmitModalForm(form) {
    })
    submit.addEventListener('click', async (event) => {
       event.preventDefault()
-      await sendForm(form)
+      await sendNewWorkForm(form)
    })
    return submit
 }
@@ -436,7 +436,7 @@ function onLoad() {
    }
 }
 
-async function sendForm(form) {
+async function sendNewWorkForm(form) {
    const modalDiv = qs('.modal-btns')
    const newMessage = createElement('p', {
       class: 'add-message',
@@ -446,30 +446,37 @@ async function sendForm(form) {
    try {
       const formData = new FormData(form)
       const category = qs('.input-selected')
-      formData.append('category', category.dataset.id)
-      const token = sessionStorage.getItem('userToken')
-      const response = await fetch(`${BASE_URL}/works`, {
-         method: 'POST',
-         body: formData,
-         headers: {
-            Authorization: `Bearer ${token}`,
-         },
-      })
-      const newWork = await response.json()
-      if (response.status === 201) {
-         const galleryNode = qs('.gallery')
-         if (existingMessage) {
-            existingMessage.replaceWith(newMessage)
-         } else {
-            modalDiv.prepend(newMessage)
-         }
-         appendFullFigure(galleryNode, newWork)
-      } else if (response.status === 401) {
-         throw 'Vous devez être connectée pour effectuer cette action'
-      } else if (response.status === 500 || response.status === 400) {
-         throw 'Vous devez remplir tous les champs'
+      if (!category) {
+         throw 'Vous devez sélectionner une catégorie'
       } else {
-         throw 'Erreur inattendue'
+         formData.append('category', category.dataset.id)
+         const token = sessionStorage.getItem('userToken')
+         const response = await fetch(`${BASE_URL}/works`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+               Authorization: `Bearer ${token}`,
+            },
+         })
+         const newWork = await response.json()
+         if (response.status === 201) {
+            const galleryNode = qs('.gallery')
+            if (existingMessage) {
+               existingMessage.replaceWith(newMessage)
+            } else {
+               modalDiv.prepend(newMessage)
+            }
+            appendFullFigure(galleryNode, newWork)
+         } else if (response.status === 401) {
+            throw 'Vous devez être connectée pour effectuer cette action'
+         } else if (response.status === 500) {
+            console.log(response.status)
+            throw 'Vous devez choisir une image'
+         } else if (response.status === 400) {
+            throw "Vous devez donner un titre à l'image"
+         } else {
+            throw 'Erreur inattendue'
+         }
       }
    } catch (error) {
       newMessage.textContent = error
