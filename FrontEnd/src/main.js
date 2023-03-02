@@ -325,7 +325,7 @@ function createInput() {
       class: 'fa-regular fa-chevron-down',
    })
 
-   // Appends the placeholder and chevron (stored in assets.js)
+   // Appends the placeholder and chevron
    inputPlaceholder.appendChild(placeholder)
    inputPlaceholder.appendChild(dropdownIcon)
    input.appendChild(inputPlaceholder)
