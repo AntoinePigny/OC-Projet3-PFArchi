@@ -149,6 +149,7 @@ function showModalGallery(works) {
    })
    const deleteAllWorks = createElement('a', {
       text: 'Supprimer la galerie',
+      class: 'red',
    })
    galleryNode.replaceChildren(...works.map(createFullThumbnail))
    modal.insertBefore(galleryNode, btnsContainer)
@@ -239,6 +240,18 @@ async function showModalForm() {
 
    const previousBtn = createPreviousButton()
    modal.append(form, previousBtn)
+
+   const inputs = qsa('.mandatory-field')
+   inputs.forEach((input) => {
+      input.addEventListener('input', changeColorSubmit)
+   })
+
+   const catInput = qs('.placeholder')
+   const catOptions = {
+      attributes: true,
+   }
+   const catObserver = new MutationObserver(changeColorSubmit)
+   catObserver.observe(catInput, catOptions)
 }
 
 /**
@@ -265,18 +278,23 @@ function createPhotoInput(photoLabel) {
       name: 'image',
       type: 'file',
       id: 'add-photo',
-      class: 'hidden',
+      class: 'hidden mandatory-field',
    })
-   photoInput.onchange = (e) => {
+   photoInput.addEventListener('input', (e) => {
       const [file] = photoInput.files
-      if (file) {
+      if (!file == '') {
+         const urlObject = URL.createObjectURL(file)
          const photoThumb = createElement('img', {
             id: 'thumb-id',
-            src: URL.createObjectURL(file),
+            src: urlObject,
          })
-         photoLabel.replaceChildren(photoThumb)
+         photoThumb.onload = () => {
+            URL.revokeObjectURL(urlObject)
+            console.log(photoThumb.src)
+            photoLabel.replaceChildren(photoThumb)
+         }
       }
-   }
+   })
    return photoInput
 }
 
@@ -286,6 +304,7 @@ function createTitleModalForm() {
       name: 'title',
       type: 'text',
       id: 'photo-title',
+      class: 'mandatory-field',
    })
    return [titleLabel, titleInput]
 }
@@ -379,6 +398,8 @@ async function createSubmitModalForm(form) {
    const submit = createElement('input', {
       type: 'submit',
       value: 'Valider',
+      id: 'new-work-submit',
+      class: 'grey-background',
    })
    submit.addEventListener('click', async (event) => {
       event.preventDefault()
@@ -422,11 +443,16 @@ function onLoad() {
          addModifyLink(modifier.container, modifier.isAtStart, modifier.isClickable)
       })
 
-      const overlay = qs('.overlay')
-      const logoutBtn = qs('.apply-changes')
+      const filters = qs('#projects-filters')
+      filters.classList.add('hidden')
 
+      const loginBtn = qs('.login-btn')
+      loginBtn.textContent = 'logout'
+      loginBtn.href = '#'
+      loginBtn.addEventListener('click', logout)
+
+      const overlay = qs('.overlay')
       overlay.addEventListener('click', closeModal)
-      logoutBtn.addEventListener('click', logout)
    }
 
    try {
@@ -446,7 +472,7 @@ async function sendNewWorkForm(form) {
    try {
       const formData = new FormData(form)
       const category = qs('.input-selected')
-      if (!category) {
+      if (!category || category.textContent === 'Catégorie') {
          throw 'Vous devez sélectionner une catégorie'
       } else {
          formData.append('category', category.dataset.id)
@@ -467,6 +493,7 @@ async function sendNewWorkForm(form) {
                modalDiv.prepend(newMessage)
             }
             appendFullFigure(galleryNode, newWork)
+            resetNewWorkForm()
          } else if (response.status === 401) {
             throw 'Vous devez être connectée pour effectuer cette action'
          } else if (response.status === 500) {
@@ -488,6 +515,38 @@ async function sendNewWorkForm(form) {
    }
 }
 
+function changeColorSubmit() {
+   const submit = qs('#new-work-submit')
+   const valuesList = []
+   const inputs = qsa('.mandatory-field')
+   const catInput = qs('.placeholder')
+
+   inputs.forEach((input) => {
+      const inputValue = input.value
+      valuesList.push(inputValue)
+   })
+
+   if (!valuesList.includes('') && catInput.textContent !== 'Catégorie') {
+      submit.classList.remove('grey-background')
+   } else {
+      submit.classList.add('grey-background')
+   }
+}
+
+/**
+ * ! A REGLER, la miniature ne se met plus a jour si je change le label par un nouveau label
+ */
+function resetNewWorkForm() {
+   const form = qs('#new-work-form')
+   const category = qs('.input-selected')
+   const oldPhotoLabel = qs('.add-photo-label')
+   const newPhotoLabel = createPhotoLabel()
+   if (category) category.textContent = 'Catégorie'
+   if (form) {
+      form.reset()
+   }
+}
+
 function openModal() {
    const modal = qs('.modal')
    const overlay = qs('.overlay')
@@ -498,8 +557,11 @@ function openModal() {
 function closeModal() {
    const modal = qs('.modal')
    const overlay = qs('.overlay')
+   resetNewWorkForm()
    modal.classList.add('hidden')
    overlay.classList.add('hidden')
+   const existingMessage = qs('.add-message')
+   if (existingMessage) existingMessage.remove()
 }
 
 async function previousModal() {
@@ -534,7 +596,7 @@ function addModifyBanner(parent, referent) {
    })
    div.append(icon, text)
 
-   modifyBanner.append(applyChangesButton, div)
+   modifyBanner.append(div, applyChangesButton)
    const referenceElement = qs(referent)
    const parentElement = qs(parent)
    parentElement.insertBefore(modifyBanner, referenceElement)

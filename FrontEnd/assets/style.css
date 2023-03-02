@@ -615,7 +615,18 @@ input[type='submit'] {
 }
 
 .hidden {
-   display: none;
+   display: none !important;
+}
+
+.red {
+   color: #d65353;
+   font-weight: 400;
+   font-style: normal;
+   font-size: 14px;
+}
+
+.grey-background {
+   background-color: #a7a7a7 !important;
 }
 
 footer nav ul {
