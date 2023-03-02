@@ -565,11 +565,3 @@ function addModifyLink(containerString, isAtStart, isClickable) {
       container.appendChild(div)
    }
 }
-
-//A débriefer
-
-/**
- * pour le file input, cacher l'input et styliser le label ! (voir createObjectURL)
- * pour le selecteur, c'est un ul>li, chercher selecteur custom js
- *
- */

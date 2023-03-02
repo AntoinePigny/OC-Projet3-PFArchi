@@ -566,7 +566,6 @@ input[type='submit'] {
 }
 
 .input-active {
-   border-color: var(--colorAccent);
    border-bottom-left-radius: 0px !important;
    border-bottom-right-radius: 0px !important;
 }
@@ -580,14 +579,6 @@ input[type='submit'] {
 
 .input:hover {
    cursor: pointer;
-}
-
-.placeholder {
-   color: var(--colorPlaceholder);
-}
-
-.input-selected {
-   color: var(--colorPrimaryDark);
 }
 
 /* Dropdown styling */
@@ -621,7 +612,6 @@ input[type='submit'] {
 .structure > div > p {
    font-weight: 400;
    font-size: 13px;
-   color: var(--colorPlaceholder);
 }
 
 .hidden {
