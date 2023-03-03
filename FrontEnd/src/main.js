@@ -533,14 +533,9 @@ function changeColorSubmit() {
    }
 }
 
-/**
- * ! A REGLER, la miniature ne se met plus a jour si je change le label par un nouveau label
- */
 function resetNewWorkForm() {
    const form = qs('#new-work-form')
    const category = qs('.input-selected')
-   const oldPhotoLabel = qs('.add-photo-label')
-   const newPhotoLabel = createPhotoLabel()
    if (category) category.textContent = 'Catégorie'
    if (form) {
       form.reset()
