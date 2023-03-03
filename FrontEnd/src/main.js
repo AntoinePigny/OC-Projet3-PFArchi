@@ -535,10 +535,11 @@ function changeColorSubmit() {
 
 function resetNewWorkForm() {
    const form = qs('#new-work-form')
+   const newForm = showModalForm()
    const category = qs('.input-selected')
    if (category) category.textContent = 'Catégorie'
    if (form) {
-      form.reset()
+      form.replaceWith(newForm)
    }
 }
 
